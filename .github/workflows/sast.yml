@@ -1,0 +1,29 @@
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v5.2.0
+      with:
+        projectBaseDir: .
+        args: > 
+          -Dsonar.projectKey=JuiceShop
+          -X
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    - name: CodeQL Init
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript
+        build-mode: none
+    - name: CodeQL Analyze
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "security"
+        upload: false
