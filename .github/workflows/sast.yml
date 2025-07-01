@@ -16,14 +16,17 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "security"
+        output: sarif-results
         upload: false
+    - name: Test
+      run: ls sarif-results
     - name: SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v5.2.0
       with:
         projectBaseDir: .
         args: > 
           -Dsonar.projectKey=JuiceShop
-          -Dsonar.sarifReportPaths=javascript.sarif
+          -Dsonar.sarifReportPaths=sarif-results/javascript.sarif
           -X
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
