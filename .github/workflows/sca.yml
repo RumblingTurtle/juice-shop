@@ -16,13 +16,11 @@ jobs:
         version: v0.63.0
     - name: Trivy Scan
       run: trivy image --security-checks vuln --format cyclonedx --output result.json juiceshop
-    - uses: DependencyTrack/gh-upload-sbom@v3
-      with:
-        protocol: https
-        serverHostname: ${{ secrets.DEPENDENCYTRACK_HOSTNAME }}
-        port: ${{ secrets.DEPENDENCYTRACK_PORT }}
-        apiKey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
-        projectName: 'JuiceShop'
-        projectVersion: 'master'
-        bomFilename: "result.json"
-        autoCreate: false
+    - name: Upload Trivy scan to DT
+      run: |
+        curl -X "POST" "https://${{ secrets.DEPENDENCYTRACK_HOSTNAME }}/api/v1/bom" \
+          -H 'Content-Type: multipart/form-data' \
+          -H 'X-Api-Key: ${{ secrets.DEPENDENCYTRACK_APIKEY }}' \
+          -F "projectName=JuiceShop" \
+          -F "bom=@result.json" \
+          -F "autoCreate=true" \
